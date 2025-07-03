@@ -12,25 +12,63 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
-  web:
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-appuser} -d ${POSTGRES_DB:-appdb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  fastapi-app:
     build:
       context: ./fastapi-app
       dockerfile: Dockerfile
-
+    container_name: fastapi_app
     ports:
       - "8000:8000"
     depends_on:
       - db
+    networks:
+      - app_network
     environment:
       DB_HOST: db
       DB_PORT: 5432
       DB_NAME: appdb
       DB_USER: appuser
       DB_PASSWORD: apppass123
-    # volumes:
-    #   - .:/app
-    # command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+   
+  # 3. Prometheus (only local scraping of nodejs-app and itself)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+      - "--storage.tsdb.retention.time=15d"
+    networks:
+      - app_network
+    restart: unless-stopped
+    depends_on:
+      - fastapi-app
 
 volumes:
   postgres_data:
+    driver: local
+  prometheus_data:
+    driver: local
+
+networks:
+  app_network:
+    driver: bridge
