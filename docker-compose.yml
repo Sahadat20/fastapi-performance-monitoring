@@ -28,9 +28,9 @@ services:
       DB_NAME: appdb
       DB_USER: appuser
       DB_PASSWORD: apppass123
-    volumes:
-      - .:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    # volumes:
+    #   - .:/app
+    # command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 volumes:
   postgres_data:
