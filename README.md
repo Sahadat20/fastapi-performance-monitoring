@@ -95,9 +95,15 @@ histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by 
 ### Prerequisites
 - Docker + Docker Compose installed
 
+### Checkout the Application Repository
+- Clone the application repository here as well. It contains the necessary monitoring files:
+```bash
+git clone https://github.com/Sahadat20/fastapi-performance-monitoring.git
+cd fastapi-performance-monitoring
+```
 ### 🚀 Run with Docker
 ```bash
-docker-compose up --build
+docker-compose up --d
 ```
 
 ### App URLs

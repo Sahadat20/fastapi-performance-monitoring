@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 from . import models, schemas, crud
 from .database import SessionLocal, engine, Base
 from fastapi import Response
-from .metrics import metrics_endpoint, MetricsMiddleware
+from app.metrics.metrics import metrics_endpoint
+from app.middleware.metrics_middleware import MetricsMiddleware
 from .health import get_health_status
 
 # Create database tables

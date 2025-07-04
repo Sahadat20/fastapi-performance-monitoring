@@ -11,7 +11,7 @@ from prometheus_client import (
 )
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from .database import SessionLocal
+from app.database import SessionLocal
 
 registry = CollectorRegistry()
 
@@ -77,7 +77,7 @@ threading.Thread(target=cpu_usage_sampler, daemon=True).start()
 
 # DB connection check every 5s
 def db_connection_sampler():
-    from .database import engine
+    from app.database import engine
     while True:
         if engine.pool:
             db_connections_active.set(engine.pool.checkedin() + engine.pool.checkedout())
@@ -86,25 +86,9 @@ def db_connection_sampler():
 threading.Thread(target=db_connection_sampler, daemon=True).start()
 
 # Metrics endpoint
-from fastapi import Request, Response
+
 
 def metrics_endpoint():
     return generate_latest(registry), CONTENT_TYPE_LATEST
 
-# Middleware for tracking HTTP request metrics
-from starlette.middleware.base import BaseHTTPMiddleware
 
-class MetricsMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        start_time = time.time()
-        response = await call_next(request)
-        duration = time.time() - start_time
-
-        route = request.url.path
-        method = request.method
-        status_code = response.status_code
-
-        http_requests_total.labels(method=method, route=route, status_code=status_code).inc()
-        http_request_duration.labels(method=method, route=route, status_code=status_code).observe(duration)
-
-        return response
