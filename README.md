@@ -109,7 +109,7 @@ docker-compose up --d
 - Metrics Endpoint: http://localhost:8000/metrics
 - Health check Endpoint: http://localhost:8000/health
 - Data Endpoint: http://localhost:8000/data
-- Promethues client Endpoint: http://localhost:9090
+- Prometheus client Endpoint: http://localhost:9090
 
 
 ### Insert Data
