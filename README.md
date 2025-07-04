@@ -40,8 +40,7 @@ fastapi-metrics-app/
 │   ├── main.py               # App entrypoint
 │   ├── metrics/
 │   │   ├── __init__.py
-│   │   ├── system_metrics.py # CPU, memory, threads, uptime, GC
-│   │   └── http_metrics.py   # Request counters, durations
+│   │   ├── metrics.py # CPU, memory, threads, uptime, GC, Request counters, durations
 │   └── middleware/
 │       └── metrics_middleware.py # HTTP metric tracking middleware
 ├── Dockerfile
