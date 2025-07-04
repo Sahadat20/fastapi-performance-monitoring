@@ -22,11 +22,16 @@ def get_db():
 # Register Prometheus middleware
 app.add_middleware(MetricsMiddleware)
 
-@app.post("/users", response_model=schemas.UserOut)
+# ✅ Root Endpoint
+@app.get("/", response_model=schemas.RootMessage, tags=["Root"])
+def root():
+    return {"message": "Welcome to the FastAPI Metrics Monitoring System!"}
+
+@app.post("/data", response_model=schemas.UserOut)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db, user)
 
-@app.get("/users", response_model=list[schemas.UserOut])
+@app.get("/data", response_model=list[schemas.UserOut])
 def read_users(db: Session = Depends(get_db)):
     return crud.get_all_users(db)
 @app.get("/metrics")
